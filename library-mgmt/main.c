@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <conio.h>
 #include <string.h>
+#include <dirent.h>
 
 #define contentSize 1024
 
@@ -9,6 +10,7 @@ void viewBook();
 void editBook();
 void deleteBook();
 void searchBook();
+void viewBooks();
 void changePass();
 
 int main()
@@ -30,7 +32,7 @@ int main()
         printf("Welcome to Library Management System!\n\n");
         printf("Choose the options below: \n");
         printf("1.Add Book\n2.View Book\n3.Edit Book Record\n");
-        printf("4.Delete Book\n5.Search Book\n6.Change Password\n7.Close Applicattion\n");
+        printf("4.Delete Book\n5.list all books\n6.Search Book\n7.Change Password\n8.Close Applicattion\n");
         printf("\n");
         while (loop != 0)
         {
@@ -51,12 +53,15 @@ int main()
                 deleteBook();
                 break;
             case 5:
-                searchBook();
+                viewBooks();
                 break;
             case 6:
-                changePass();
+                searchBook();
                 break;
             case 7:
+                changePass();
+                break;
+            case 8:
                 loop--;
                 break;
             default:
@@ -178,6 +183,37 @@ void searchBook()
         }
     }
     fclose(fp);
+}
+
+void viewBooks()
+{
+    DIR *dir;
+    struct dirent *entry;
+    // opening current directory
+    dir = opendir(".");
+    char *exclude[] = {"main.c", "main.exe"};
+    if (dir == NULL)
+    {
+        printf("No Books in the directory!\n");
+    }
+    while ((entry = readdir(dir)) != NULL)
+    {
+        // Check if the file name is in the exclude list
+        int exclude_file = 0;
+        for (int i = 0; i < sizeof(exclude) / sizeof(exclude[0]); i++)
+        {
+            if (strcmp(entry->d_name, exclude[i]) == 0)
+            {
+                exclude_file = 1;
+                break;
+            }
+        }
+        if (!exclude_file)
+        {
+            printf("%s\n", entry->d_name);
+        }
+    }
+    closedir(dir);
 }
 void changePass()
 {
