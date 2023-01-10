@@ -3,234 +3,203 @@
 #include <string.h>
 #include <dirent.h>
 
-#define contentSize 1024
-
-void addBook();
-void viewBook();
-void editBook();
-void deleteBook();
-void searchBook();
-void viewBooks();
-void changePass();
+struct book
+{
+    char book[50], content[1024];
+};
 
 int main()
 {
-    char adminName[10];
-    char password[10];
-    char username[] = "admin";
-    char pass[] = "root";
+    FILE *fp;
+    struct book s;
+    DIR *dir;
+    struct dirent *entry;
+    int i;
 
-    printf("User Login!\n\n");
-    printf("Enter Name: ");
-    scanf("%s", adminName);
-    printf("Enter Password: ");
+    // user login
+    char username[10];
+    char password[10];
+    char usernameCheck[] = "admin";
+    char pass[] = "pass";
+
+    // change pass
+    char oldpass[50], newpass[50];
+
+    printf("\tUser Login!\n\n");
+    printf("\tEnter Name: ");
+    scanf("%s", username);
+    printf("\tEnter Password: ");
     scanf("%s", password);
 
-    if (strcmp(adminName, username) == 0 && strcmp(password, pass) == 0)
+    if (strcmp(username, usernameCheck) == 0 && strcmp(password, pass) == 0)
     {
         int opt, loop = 1;
-        printf("Welcome to Library Management System!\n\n");
-        printf("Choose the options below: \n");
-        printf("1.Add Book\n2.View Book\n3.Edit Book Record\n");
-        printf("4.Delete Book\n5.list all books\n6.Search Book\n7.Change Password\n8.Close Applicattion\n");
+        printf("\t******Welcome to Library Management System!******\n\n");
+        printf("\tChoose the options below: \n");
+        printf("\t1.Add Book\n\t2.View Book\n\t3.Edit Book Record\n");
+        printf("\t4.Delete Book\n\t5.View all books\n\t6.Search Book\n\t7.Change Password\n\t8.Close Applicattion\n");
         printf("\n");
         while (loop != 0)
         {
-            printf("\noption: ");
+            printf("\n\tchoose option: ");
             scanf("%d", &opt);
             switch (opt)
             {
             case 1:
-                addBook();
+                // add book
+                printf("\tEnter book name to be added: ");
+                fflush(stdin);
+                gets(s.book);
+                if ((fp = fopen(s.book, "r")) != NULL)
+                {
+                    printf("\tBook with name=%s already exists!\n", s.book);
+                }
+                else
+                {
+                    fp = fopen(s.book, "w+");
+                    printf("\tEnter the content for the book: \n");
+                    fflush(stdin);
+                    printf("\t");
+                    gets(s.content);
+                    fprintf(fp, "%s", s.content);
+                }
+                fclose(fp);
                 break;
             case 2:
-                viewBook();
+                // view book
+                printf("\tEnter book name: ");
+                fflush(stdin);
+                gets(s.book);
+                if ((fp = fopen(s.book, "r")) == NULL)
+                {
+                    printf("\tBook doesn't exist!\n");
+                }
+                else
+                {
+                    fp = fopen(s.book, "r");
+                    printf("\t%s :\n", s.book);
+                    printf("\t");
+                    while (fscanf(fp, "%s", s.content) != EOF)
+                    {
+                        printf("%s ", s.content);
+                    }
+                    printf("\n");
+                }
+                fclose(fp);
                 break;
             case 3:
-                editBook();
+                // edit book
+                printf("\tEnter book name: ");
+                fflush(stdin);
+                gets(s.book);
+                if ((fp = fopen(s.book, "r")) == NULL)
+                {
+                    printf("\tBook doesn't exist!\n");
+                }
+                else
+                {
+                    fp = fopen(s.book, "a+");
+                    printf("\tEnter additional content for the book: \n");
+                    fflush(stdin);
+                    printf("\t");
+                    gets(s.content);
+                    fprintf(fp, "\n%s", s.content);
+                }
+                fclose(fp);
                 break;
             case 4:
-                deleteBook();
+                // delete book
+                printf("\tBook to delete: ");
+                fflush(stdin);
+                gets(s.book);
+                if ((fp = fopen(s.book, "r")) == NULL)
+                {
+                    printf("\tBook doesn't exist!\n");
+                }
+                fclose(fp);
+                remove(s.book);
+                printf("\n\tBook deleted!\n");
                 break;
             case 5:
-                viewBooks();
+                // view all books
+                // opening current directory
+                dir = opendir(".");
+                char *exclude[] = {"main.c", "main.exe"};
+                if (dir == NULL)
+                {
+                    printf("\tNo Books in the directory!\n");
+                }
+                while ((entry = readdir(dir)) != NULL)
+                {
+                    // Check if the file name is in the exclude list
+                    int exclude_file = 0;
+                    for (i = 0; i < sizeof(exclude) / sizeof(exclude[0]); i++)
+                    {
+                        if (strcmp(entry->d_name, exclude[i]) == 0)
+                        {
+                            exclude_file = 1;
+                            break;
+                        }
+                    }
+                    if (!exclude_file)
+                    {
+                        printf("\t%s\n", entry->d_name);
+                    }
+                }
+                closedir(dir);
                 break;
             case 6:
-                searchBook();
+                // search book
+                printf("\tenter book name: ");
+                fflush(stdin);
+                gets(s.book);
+
+                if ((fp = fopen(s.book, "r")) == NULL)
+                {
+                    printf("\tBook doesn't exist!\n", s.book);
+                }
+                else if ((fp = fopen(s.book, "r")) != NULL)
+                {
+                    fp = fopen(s.book, "r");
+                    printf("\tBook with name %s exists!\n", s.book);
+                    printf("\t%s :\n", s.book);
+                    printf("\t");
+                    while (fscanf(fp, "%s", s.content) != EOF)
+                    {
+                        printf("%s ", s.content);
+                    }
+                }
+                fclose(fp);
                 break;
             case 7:
-                changePass();
+                // change password
+                printf("\tEnter old password: ");
+                fflush(stdin);
+                gets(oldpass);
+                if (strcmp(oldpass, pass) == 0)
+                {
+                    printf("\n\tenter new password: ");
+                    fflush(stdin);
+                    gets(newpass);
+                    printf("\n\tpassword has been updated!");
+                }
+                else
+                {
+                    printf("\tWrong Credentials!\n");
+                }
                 break;
             case 8:
+                // close application
                 loop--;
                 break;
             default:
-                printf("That option does not exist!\n");
+                printf("\tThat option does not exist!\n");
                 break;
             }
         }
     }
     else
     {
-        printf("Invalid Credentials!");
-    }
-}
-
-void addBook()
-{
-    FILE *fp;
-    char book[50];
-    char content[500];
-    printf("Enter name of new book: ");
-    fflush(stdin);
-    gets(book);
-    if ((fp = fopen(book, "r")) != NULL)
-    {
-        printf("Book with name=%s already exists!\n", book);
-    }
-    else
-    {
-        fp = fopen(book, "w+");
-        printf("Enter the content for the book: \n");
-        fflush(stdin);
-        gets(content);
-        fprintf(fp, "%s", content);
-    }
-    fclose(fp);
-}
-
-void viewBook()
-{
-    FILE *fp;
-    char book[50];
-    char content[contentSize];
-    printf("Enter book name: ");
-    fflush(stdin);
-    gets(book);
-    if ((fp = fopen(book, "r")) == NULL)
-    {
-        printf("Book doesn't exist!\n");
-    }
-    else
-    {
-        fp = fopen(book, "r");
-        printf("%s :\n", book);
-        while (fscanf(fp, "%s", content) != EOF)
-        {
-            printf("%s ", content);
-        }
-        printf("\n");
-    }
-    fclose(fp);
-}
-void editBook()
-{
-    FILE *fp;
-    char book[50];
-    char newContent[contentSize];
-    printf("Enter book name: ");
-    fflush(stdin);
-    gets(book);
-    if ((fp = fopen(book, "r")) == NULL)
-    {
-        printf("Book doesn't exist!\n");
-    }
-    else
-    {
-        fp = fopen(book, "a+");
-        printf("Enter additional content for the book: \n");
-        fflush(stdin);
-        gets(newContent);
-        fprintf(fp, "\n%s", newContent);
-    }
-    fclose(fp);
-}
-void deleteBook()
-{
-    FILE *fp;
-    char book[50];
-    printf("Book to delete: ");
-    fflush(stdin);
-    gets(book);
-    if ((fp = fopen(book, "r")) == NULL)
-    {
-        printf("Book doesn't exist!\n");
-    }
-    fclose(fp);
-    remove(book);
-}
-void searchBook()
-{
-    FILE *fp;
-    char book[50];
-    char content[contentSize];
-    printf("enter book name: ");
-    fflush(stdin);
-    gets(book);
-
-    if ((fp = fopen(book, "r")) == NULL)
-    {
-        printf("Book doesn't exist!\n", book);
-    }
-    else if ((fp = fopen(book, "r")) != NULL)
-    {
-        fp = fopen(book, "r");
-        printf("Book with name %s exists!\n", book);
-        printf("%s :\n", book);
-        while (fscanf(fp, "%s", content) != EOF)
-        {
-            printf("%s ", content);
-        }
-    }
-    fclose(fp);
-}
-
-void viewBooks()
-{
-    DIR *dir;
-    struct dirent *entry;
-    // opening current directory
-    dir = opendir(".");
-    char *exclude[] = {"main.c", "main.exe"};
-    if (dir == NULL)
-    {
-        printf("No Books in the directory!\n");
-    }
-    while ((entry = readdir(dir)) != NULL)
-    {
-        // Check if the file name is in the exclude list
-        int exclude_file = 0;
-        for (int i = 0; i < sizeof(exclude) / sizeof(exclude[0]); i++)
-        {
-            if (strcmp(entry->d_name, exclude[i]) == 0)
-            {
-                exclude_file = 1;
-                break;
-            }
-        }
-        if (!exclude_file)
-        {
-            printf("%s\n", entry->d_name);
-        }
-    }
-    closedir(dir);
-}
-void changePass()
-{
-    char oldpass[50], newpass[50];
-    char pass[] = "root";
-    printf("Enter old password: ");
-    fflush(stdin);
-    gets(oldpass);
-    if (strcmp(oldpass, pass) == 0)
-    {
-        printf("\nenter new password: ");
-        fflush(stdin);
-        gets(newpass);
-        printf("\npassword has been updated!");
-    }
-    else
-    {
-        printf("Wrong Credentials!\n");
+        printf("\tInvalid Credentials!");
     }
 }
