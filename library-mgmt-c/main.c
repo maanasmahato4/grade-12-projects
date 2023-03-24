@@ -1,244 +1,205 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <strings.h>
 #include <conio.h>
+#include <string.h>
+#include <dirent.h>
 
-int changeprice(int);
-void reservation(int *, int, int);
-int option1(void);
-void cancel(int *);
-void ticket1(int option, char name[10], int id1, int price);
-void ticket2(int option, char name[10], int id1, int price);
-void ticket3(int option, char name[10], int id1, int price);
-int curr_movie(void);
-int movie(void);
-void details(void);
-
-struct movie
+struct book
 {
-    char name[25];
-    char phone[15];
-    int seat;
-    int id;
-} person[300];
+    char book[50], content[1024];
+};
 
-int count = 0;
-int id1 = 1000;
 int main()
 {
-    int **seat, option, price = 500, selection, i;
-    seat = (int **)calloc(101, sizeof(int *));
-    for (i = 0; i < 3; i++)
-        *(seat + i) = (int *)calloc(101, sizeof(int));
-    int x;
-    while (x != 5)
-    {
-        option = option1();
-        switch (option)
-        {
-        case 1:
-            price = changeprice(price);
-            break;
-        case 2:
-            details();
-            break;
-        case 3:
-            selection = movie();
-            reservation(seat[selection - 1], price, selection);
-            count++;
-            break;
-        case 4:
-            selection = curr_movie();
-            cancel(seat[selection - 1]);
-            break;
-        case 5:
-            x = 5;
-            break;
-        default:
-            printf("Error\n");
-            break;
-        }
-    }
-}
-int changeprice(int price)
-{
-    char pass[10], pak[10] = "maanas";
-    printf("Enter the password: ");
-    scanf("%s", &pass);
-    if (strcmp(pass, pak) == 0)
-    {
-        printf("enter new price: ");
-        scanf("%d", &price);
-        fflush(stdin);
-    }
-    else
-        printf("password is wrong! ");
-    return price;
-}
-void reservation(int *array, int price, int slection)
-{
-    int i, j;
-    printf("\n                                SCREEN\n\n\n");
-    for (i = 1; i <= 100; i++)
-    {
-        if (array[i] == 0)
-            printf("%d\t", i);
-        else
-            printf("*\t", i);
-        if (i % 10 == 0)
-            printf("\n\n");
-    }
-    printf("enter your name: ");
-    fflush(stdin);
-    gets(person[count].name);
-    printf("enter your phone number: ");
-    scanf("%u", &person[count].phone);
-    printf("Which seat number you want? ");
-    scanf("%d", &j);
-    if (j > 100 || j < 1)
-    {
-        printf("seat1 number is unavailable in this theater\n");
-        printf("Please re-enter seat number: ");
-        scanf("%d", &j);
-    }
-    if (array[j] == 1)
-    {
-        printf("Sorry, this ticket is already booked! Please choose another seat.\n");
-        scanf("%d", &j);
-    }
-    else
-        array[j] = 1;
-    person[count].seat = j;
-    if (slection == 1)
-        ticket1(j, person[count].name, id1, price);
-    else if (slection == 2)
-        ticket2(j, person[count].name, id1, price);
-    else
-        ticket3(j, person[count].name, id1, price);
-    id1++;
-}
-int option1(void)
-{
-    int option;
-    printf("                 Simple Movie Ticket Booking System\n");
-    printf("#****************************************************************#\n");
-    printf("#             1- To edit price of ticket:                        #\n");
-    printf("#             2- To view reserved tickets:                       #\n");
-    printf("#             3- To puchase ticket:                              #\n");
-    printf("#             4- To cancel the seat:                             #\n");
-    printf("#             5- Exit:                                           #\n");
-    printf("#****************************************************************#\n");
-    printf("  Enter your option: ");
-    scanf("%d", &option);
-    return option;
-}
-void cancel(int *array)
-{
-    int Cseat, i, stop;
-    printf("Please enter ID number of ticket: ");
-    scanf("%d", &Cseat);
-    for (i = 0; i < 300; i++)
-    {
-        if (Cseat == person[i].id)
-        {
-            stop = 5;
-            printf("%s your seat is %d cancelled\n", person[i].name, person[i].seat);
-            array[person[i].seat] = 0;
-            i = 300;
-        }
-    }
-    if (stop != 5)
-        printf("Ticket ID number is incorrect please enter right one to cancel ticket: \n");
-}
-void ticket1(int option, char name[10], int id1, int price)
-{
-    fflush(stdin);
-    printf("\n\n");
-    printf("\t ##################THEATER BOOKING TICKET##################\n");
-    printf("\t*************************************************************\n");
-    printf("\t Booking ID : %d \t\t\tShow Name : The Amazing Spiderman\n", id1);
-    printf("\t Customer  : %s\n", name);
-    printf("\t\t\t                              Date      : 29-04-2024\n");
-    printf("\t                                              Time      : 08:00pm\n");
-    printf("\t                                              Hall      : 02\n");
-    printf("\t                                              seats No. : %d  \n", option);
-    printf("\t                                              price . : %d  \n\n", price);
-    person[count].id = id1;
-    printf("\t*************************************************************\n");
-    return;
-}
-void details(void)
-{
+    FILE *fp;
+    struct book s;
+    DIR *dir;
+    struct dirent *entry;
     int i;
-    char pass[10], pak[10] = "maanas";
-    printf("Enter the password to see details: ");
-    scanf("%s", &pass);
-    if (strcmp(pass, pak) == 0)
-    {
-        for (i = 0; i < count; i++)
-        {
-            printf("seat no: %d is booked by %s booking id is %d\n", person[i].seat, person[i].name, person[i].id);
-        }
-    }
-    else
-        printf("Entered password is wrong \n");
-}
-int movie(void)
-{
-    int i;
-    fflush(stdin);
-    printf("\t\t\twhich movie you want to see?\n");
-    printf("\t\t\t----------------------------\n\n");
-    printf("\t\t\tpress 1 for The Amazing Spiderman\n\n");
-    printf("\t\t\tpress 2 for Bahubali 1\n\n");
-    printf("\t\t\tpress 3 for Need For Speed\n");
-    scanf("%d", &i);
-    fflush(stdin);
-    return i;
-}
-void ticket2(int option, char name[10], int id1, int price)
-{
-    fflush(stdin);
-    printf("\n\n");
-    printf("\t ##################THEATER BOOKING TICKET##################\n");
-    printf("\t*************************************************************\n");
-    printf("\t Booking ID : %d \t\t\tShow Name : Bahubali 1\n", id1);
-    printf("\t Customer  : %s\n", name);
-    printf("\t\t\t                              Date      : 29-04-2024\n");
-    printf("\t                                              Time      : 09:00pm\n");
-    printf("\t                                              Hall      : 03\n");
-    printf("\t                                              seats No. : %d  \n", option);
-    printf("\t                                              price . : %d  \n\n", price);
-    person[count].id = id1;
-    printf("\t*************************************************************\n");
-    return;
-}
-int curr_movie(void)
-{
-    int i;
-    printf("\t\t\twhich movie ticket you want to cancel\n");
-    printf("\t\t\t-------------------------------------\n");
-    printf("\t\t\tpress 1 for The Amazing Spiderman\n\n");
-    printf("\t\t\tpress 2 for Bahubali 1\n\n");
-    printf("\t\t\tpress 3 for Need For Speed\n");
-    scanf("%d", &i);
-    return i;
-}
-void ticket3(int option, char name[10], int id1, int price)
-{
-    fflush(stdin);
-    printf("\n\n");
-    printf("\t ##################THEATER BOOKING TICKET##################\n");
-    printf("\t*************************************************************\n");
-    printf("\t Booking ID : %d \t\t\tShow Name : Need For Speed\n", id1);
-    printf("\t Customer  : %s\n", name);
-    printf("\t\t\t                              Date      : 29-04-2024\n");
-    printf("\t                                              Time      : 10:00pm\n");
-    printf("\t                                              Hall      : 04\n");
-    printf("\t                                              seats No. : %d  \n", option);
-    printf("\t                                              price . : %d  \n\n", price);
-    person[count].id = id1;
-    printf("\t*************************************************************\n");
-    return;
-}
 
+    // user login
+    char username[10];
+    char password[10];
+    char usernameCheck[] = "admin";
+    char pass[] = "pass";
+
+    // change pass
+    char oldpass[50], newpass[50];
+
+    printf("\tUser Login!\n\n");
+    printf("\tEnter Name: ");
+    scanf("%s", username);
+    printf("\tEnter Password: ");
+    scanf("%s", password);
+
+    if (strcmp(username, usernameCheck) == 0 && strcmp(password, pass) == 0)
+    {
+        int opt, loop = 1;
+        printf("\t******Welcome to Library Management System!******\n\n");
+        printf("\tChoose the options below: \n");
+        printf("\t1.Add Book\n\t2.View Book\n\t3.Edit Book Record\n");
+        printf("\t4.Delete Book\n\t5.View all books\n\t6.Search Book\n\t7.Change Password\n\t8.Close Applicattion\n");
+        printf("\n");
+        while (loop != 0)
+        {
+            printf("\n\tchoose option: ");
+            scanf("%d", &opt);
+            switch (opt)
+            {
+            case 1:
+                // add book
+                printf("\tEnter book name to be added: ");
+                fflush(stdin);
+                gets(s.book);
+                if ((fp = fopen(s.book, "r")) != NULL)
+                {
+                    printf("\tBook with name=%s already exists!\n", s.book);
+                }
+                else
+                {
+                    fp = fopen(s.book, "w+");
+                    printf("\tEnter the content for the book: \n");
+                    fflush(stdin);
+                    printf("\t");
+                    gets(s.content);
+                    fprintf(fp, "%s", s.content);
+                }
+                fclose(fp);
+                break;
+            case 2:
+                // view book
+                printf("\tEnter book name: ");
+                fflush(stdin);
+                gets(s.book);
+                if ((fp = fopen(s.book, "r")) == NULL)
+                {
+                    printf("\tBook doesn't exist!\n");
+                }
+                else
+                {
+                    fp = fopen(s.book, "r");
+                    printf("\t%s :\n", s.book);
+                    printf("\t");
+                    while (fscanf(fp, "%s", s.content) != EOF)
+                    {
+                        printf("%s ", s.content);
+                    }
+                    printf("\n");
+                }
+                fclose(fp);
+                break;
+            case 3:
+                // edit book
+                printf("\tEnter book name: ");
+                fflush(stdin);
+                gets(s.book);
+                if ((fp = fopen(s.book, "r")) == NULL)
+                {
+                    printf("\tBook doesn't exist!\n");
+                }
+                else
+                {
+                    fp = fopen(s.book, "a+");
+                    printf("\tEnter additional content for the book: \n");
+                    fflush(stdin);
+                    printf("\t");
+                    gets(s.content);
+                    fprintf(fp, "\n%s", s.content);
+                }
+                fclose(fp);
+                break;
+            case 4:
+                // delete book
+                printf("\tBook to delete: ");
+                fflush(stdin);
+                gets(s.book);
+                if ((fp = fopen(s.book, "r")) == NULL)
+                {
+                    printf("\tBook doesn't exist!\n");
+                }
+                fclose(fp);
+                remove(s.book);
+                printf("\n\tBook deleted!\n");
+                break;
+            case 5:
+                // view all books
+                // opening current directory
+                dir = opendir(".");
+                char *exclude[] = {"main.c", "main.exe"};
+                if (dir == NULL)
+                {
+                    printf("\tNo Books in the directory!\n");
+                }
+                while ((entry = readdir(dir)) != NULL)
+                {
+                    // Check if the file name is in the exclude list
+                    int exclude_file = 0;
+                    for (i = 0; i < sizeof(exclude) / sizeof(exclude[0]); i++)
+                    {
+                        if (strcmp(entry->d_name, exclude[i]) == 0)
+                        {
+                            exclude_file = 1;
+                            break;
+                        }
+                    }
+                    if (!exclude_file)
+                    {
+                        printf("\t%s\n", entry->d_name);
+                    }
+                }
+                closedir(dir);
+                break;
+            case 6:
+                // search book
+                printf("\tenter book name: ");
+                fflush(stdin);
+                gets(s.book);
+
+                if ((fp = fopen(s.book, "r")) == NULL)
+                {
+                    printf("\tBook doesn't exist!\n", s.book);
+                }
+                else if ((fp = fopen(s.book, "r")) != NULL)
+                {
+                    fp = fopen(s.book, "r");
+                    printf("\tBook with name %s exists!\n", s.book);
+                    printf("\t%s :\n", s.book);
+                    printf("\t");
+                    while (fscanf(fp, "%s", s.content) != EOF)
+                    {
+                        printf("%s ", s.content);
+                    }
+                }
+                fclose(fp);
+                break;
+            case 7:
+                // change password
+                printf("\tEnter old password: ");
+                fflush(stdin);
+                gets(oldpass);
+                if (strcmp(oldpass, pass) == 0)
+                {
+                    printf("\n\tenter new password: ");
+                    fflush(stdin);
+                    gets(newpass);
+                    printf("\n\tpassword has been updated!");
+                }
+                else
+                {
+                    printf("\tWrong Credentials!\n");
+                }
+                break;
+            case 8:
+                // close application
+                loop--;
+                break;
+            default:
+                printf("\tThat option does not exist!\n");
+                break;
+            }
+        }
+    }
+    else
+    {
+        printf("\tInvalid Credentials!");
+    }
+}

@@ -1,0 +1,55 @@
+* {
+    margin: 0;
+    padding: 0;
+    color: black;
+}
+
+body {
+    font-family: "Open Sans";
+    font-size: 14px;
+}
+
+.container {
+    width: 600px;
+    margin: 25px auto;
+}
+
+form {
+    margin-block: 10px;
+    padding: 15px;
+    background: rgb(183, 241, 96);
+    color: #fff;
+    border-radius: 2px;
+    font-size: 16px;
+}
+
+form label,
+form input,
+form button {
+    border: 0;
+    margin-bottom: 3px;
+    display: block;
+    width: 100%;
+}
+
+form input {
+    height: 30px;
+    line-height: 25px;
+    padding: 0 6px;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+
+form button {
+    height: 40px;
+    line-height: 30px;
+    width: 100px;
+    background: blue;
+    color: #fff;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+form .error {
+    color: #ff0000;
+}
